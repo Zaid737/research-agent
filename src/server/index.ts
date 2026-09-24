@@ -1,7 +1,10 @@
+import "dotenv/config";
+
 import { McpServer } from "@modelcontextprotocol/server";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import * as z from "zod/v4";
 
+import { fetchPage } from "../tools/fetch.js";
 import { searchWeb } from "../tools/search.js";
 
 function createServer() {
@@ -34,6 +37,47 @@ function createServer() {
       };
     }
   );
+
+  server.registerTool(
+  "fetch_page",
+  {
+    description:
+      "Fetch and read the full contents of a web page. Use this after search_web when you need to inspect the actual source, verify claims, extract details, or gather evidence for the final answer.",
+    inputSchema: z.object({
+      url: z.string().url(),
+    }),
+  },
+  async ({ url }) => {
+    try {
+      const page = await fetchPage(url);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(page),
+          },
+        ],
+        structuredContent: page,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch page";
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: message,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
 
   return server;
 }

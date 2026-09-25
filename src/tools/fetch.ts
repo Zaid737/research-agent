@@ -23,7 +23,12 @@ export async function fetchPage(
 
   $("script, style, nav, footer, header, noscript").remove();
 
-  const title = $("title").text().trim();
+  const pageTitle = $("title").text().trim();
+
+  const title =
+    pageTitle.length > 0
+      ? pageTitle
+      : $("h1").first().text().trim() || url;
 
   const text = $("body")
     .text()

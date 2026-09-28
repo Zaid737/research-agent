@@ -4,8 +4,8 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import * as z from "zod/v4";
 
-import { searchWeb } from "../tools/search.js";
-import { fetchPage } from "../tools/fetch.js";
+import { searchWeb } from "../tools/search.ts";
+import { fetchPage } from "../tools/fetch.ts";
 
 function createServer() {
   const server = new McpServer({

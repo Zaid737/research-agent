@@ -1,10 +1,8 @@
 import "dotenv/config";
-
 import OpenAI from "openai";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import path from "node:path";
-
 import {
   evaluateResearch,
 } from "../critic/index.js";
@@ -20,12 +18,13 @@ type ResearchSource = {
   content: string;
 };
 
-const sources: ResearchSource[] = [];
+const sources: ResearchSource[] = [];       //collected research.
 
 const MIN_SOURCES = 2;
 const MAX_SOURCES = 5;
 const MAX_ITERATIONS = 8;
 
+//agent's goal:
 const RESEARCH_QUESTION =
   "Research the latest developments in Model Context Protocol and give me a short summary.";
 
@@ -135,6 +134,7 @@ const tsxPath = path.resolve(
   "node_modules/tsx/dist/cli.mjs"
 );
 
+//The MCP server starts as a separate process:
 const transport =
   new StdioClientTransport({
     command: process.execPath,
@@ -202,6 +202,7 @@ try {
       })
     );
 
+//first LLM call:    
   const researchMessages:
     OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
     [

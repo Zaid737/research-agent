@@ -1,0 +1,38 @@
+Following is psuedocode for agent.ts(single agent)
+
+start MCP server
+
+connect MCP client
+
+discover MCP tools
+
+convert MCP tools → OpenAI tools
+
+while (!researchComplete) {
+
+    ask LLM what to do
+
+    if LLM requests a tool:
+        execute MCP tool
+
+        give result back to LLM
+
+    collect fetched evidence
+
+    ask critic:
+
+        "Is this enough?"
+
+    if critic says sufficient:
+        researchComplete = true
+
+    else:
+        determine what information is missing
+        continue research
+}
+
+if researchComplete:
+
+    ask LLM to synthesize final answer
+
+close MCP connection

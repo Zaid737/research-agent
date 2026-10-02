@@ -2,3 +2,8 @@
 node_modules/
 .env.*
 !.env.example
+agent.ts.txt
+src/test-mcp-client.ts
+src/test-mcp-tools.ts
+src/test-planner.ts
+src/test-researcher.ts

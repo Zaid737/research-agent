@@ -27,7 +27,7 @@ export type CriticResult = {
 export type ResearchState = {
   query: string;                    //original user request
   tasks: ResearchTask[];            //Planner's output
-currentTaskId: null,
+  currentTaskId: string | null;
   sources: Source[];                //actual sources retrieved through our MCP tools             
   findings: Finding[];
   critique: CriticResult | null;

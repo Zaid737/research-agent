@@ -7,3 +7,4 @@ src/test-mcp-client.ts
 src/test-mcp-tools.ts
 src/test-planner.ts
 src/test-researcher.ts
+src/test-agent.ts

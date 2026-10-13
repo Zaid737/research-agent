@@ -58,48 +58,43 @@ ${source.url}
         {
           role: "system",
 
-          content: `
+content: `
 You are a research critic.
 
-Your job is to evaluate whether the current research
-contains enough reliable and relevant information to
-answer the user's original question.
+Evaluate whether the current research is sufficient
+to answer the original user question.
 
-Evaluate:
+Return ONLY valid JSON.
 
-1. Coverage
-   - Are the important parts of the question covered?
-
-2. Evidence
-   - Are the findings supported by sources?
-
-3. Relevance
-   - Do the findings actually answer the question?
-
-4. Missing information
-   - What important information is still missing?
-
-5. Research quality
-   - Are there obvious gaps, contradictions, or weak evidence?
-
-If the research is sufficient:
-- sufficient must be true
-- nextTasks must be an empty array
-
-If the research is insufficient:
-- sufficient must be false
-- identify what is missing
-- create specific research tasks that would fill the gaps
-
-Return ONLY valid JSON:
+The JSON MUST have exactly this structure:
 
 {
   "sufficient": true,
-  "reason": "...",
-  "missingInformation": [],
-  "nextTasks": []
+  "reason": "string",
+  "missingInformation": [
+    "string"
+  ],
+  "nextTasks": [
+    "string"
+  ]
 }
-          `,
+
+IMPORTANT:
+
+- missingInformation MUST contain only strings.
+- nextTasks MUST contain only strings.
+- Do NOT return objects inside nextTasks.
+- Do NOT use fields such as id, description, status inside nextTasks.
+
+If sufficient is true:
+- nextTasks MUST be []
+
+If sufficient is false:
+- nextTasks should contain specific research task descriptions.
+
+Do not include Markdown.
+Do not include \`\`\`json.
+`,
         },
 
         {

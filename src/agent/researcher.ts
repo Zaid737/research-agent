@@ -38,17 +38,11 @@ export async function researcher(
   state: ResearchState,
   task: ResearchTask,
 ): Promise<void> {
-  // Track which task the researcher is currently working on
   state.currentTaskId = task.id;
 
-  // Create MCP connection
   const client = await createMCPClient();
 
   try {
-    // ============================================================
-    // 1. ASK LLM TO CREATE A FOCUSED SEARCH QUERY
-    // ============================================================
-
     const searchQueryResponse =
       await openAI.chat.completions.create({
         model: "gpt-5.6-luna",
@@ -92,10 +86,6 @@ Do not answer the research task.
       `Search query: ${searchQuery}`,
     );
 
-    // ============================================================
-    // 2. SEARCH THROUGH MCP
-    // ============================================================
-
     const searchResult = (await callMCPTool(
       client,
       "search_web",
@@ -117,17 +107,7 @@ Do not answer the research task.
       `Found ${results.length} search results`,
     );
 
-    // ============================================================
-    // 3. SELECT RELEVANT RESULTS
-    // ============================================================
-
-    // For now we simply take the first 3 results.
-    // Later we will add intelligent source selection.
     const selectedResults = results.slice(0, 3);
-
-    // ============================================================
-    // 4. FETCH EACH SELECTED SOURCE
-    // ============================================================
 
     for (const result of selectedResults) {
       console.log(
@@ -142,13 +122,9 @@ Do not answer the research task.
         },
       )) as FetchResponse;
 
-      // Extract actual webpage text.
-      // Our MCP fetch_page tool returns this under `text`.
       const content =
         fetched.structuredContent?.text ?? "";
 
-      // If the page did not contain readable content,
-      // skip this source.
       if (!content) {
         console.warn(
           `No content returned for ${result.url}`,
@@ -156,10 +132,6 @@ Do not answer the research task.
 
         continue;
       }
-
-      // ==========================================================
-      // 5. CREATE SOURCE OBJECT
-      // ==========================================================
 
       const sourceId =
         `source-${state.sources.length + 1}`;
@@ -178,16 +150,11 @@ Do not answer the research task.
         content,
       };
 
-      // Store raw evidence in shared state
       state.sources.push(source);
 
       console.log(
         `Source added: ${source.title}`,
       );
-
-      // ==========================================================
-      // 6. ASK LLM TO EXTRACT FINDINGS
-      // ==========================================================
 
       const findingResponse =
         await openAI.chat.completions.create({
@@ -252,10 +219,6 @@ ${source.content}
         continue;
       }
 
-      // ==========================================================
-      // 7. PARSE FINDINGS
-      // ==========================================================
-
       try {
         const parsed = JSON.parse(
           findingContent,
@@ -273,10 +236,6 @@ ${source.content}
 
           continue;
         }
-
-        // ========================================================
-        // 8. ADD FINDINGS TO SHARED STATE
-        // ========================================================
 
         for (const finding of parsed.findings) {
           const structuredFinding: Finding = {
@@ -302,17 +261,13 @@ ${source.content}
       }
     }
 
-    // ============================================================
-    // 9. MARK TASK AS COMPLETED
-    // ============================================================
-
     task.status = "completed";
 
     console.log(
       `Completed ${task.id}: ${state.findings.length} total findings`,
     );
   } finally {
-    // Researcher is no longer working on a task
     state.currentTaskId = null;
+    await client.close();
   }
 }

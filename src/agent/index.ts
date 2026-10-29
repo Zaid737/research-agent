@@ -25,10 +25,6 @@ export async function runResearchAgent(
   console.log("\nQuery:");
   console.log(state.query);
 
-  // ============================================================
-  // 1. PLANNING
-  // ============================================================
-
   console.log("\n==============================");
   console.log("PLANNER");
   console.log("==============================");
@@ -45,10 +41,6 @@ export async function runResearchAgent(
     );
   }
 
-  // ============================================================
-  // 2. ITERATIVE RESEARCH LOOP
-  // ============================================================
-
   while (state.iteration < MAX_ITERATIONS) {
     state.iteration++;
 
@@ -57,10 +49,6 @@ export async function runResearchAgent(
       `RESEARCH ITERATION ${state.iteration}`,
     );
     console.log("==============================");
-
-    // ----------------------------------------------------------
-    // Find pending tasks
-    // ----------------------------------------------------------
 
     const pendingTasks = state.tasks.filter(
       (task) => task.status === "pending",
@@ -78,10 +66,6 @@ export async function runResearchAgent(
       `Pending tasks: ${pendingTasks.length}`,
     );
 
-    // ----------------------------------------------------------
-    // Research pending tasks
-    // ----------------------------------------------------------
-
     for (const task of pendingTasks) {
       console.log("\n------------------------------");
       console.log(
@@ -92,19 +76,11 @@ export async function runResearchAgent(
       await researcher(state, task);
     }
 
-    // ----------------------------------------------------------
-    // Critic evaluates research
-    // ----------------------------------------------------------
-
     console.log("\n==============================");
     console.log("CRITIC");
     console.log("==============================");
 
     const critique = await critic(state);
-
-    // ----------------------------------------------------------
-    // Research is sufficient
-    // ----------------------------------------------------------
 
     if (critique.sufficient) {
       console.log(
@@ -113,10 +89,6 @@ export async function runResearchAgent(
 
       break;
     }
-
-    // ----------------------------------------------------------
-    // Research is insufficient
-    // ----------------------------------------------------------
 
     console.log(
       "\nCritic says more research is required.",
@@ -130,10 +102,6 @@ export async function runResearchAgent(
       break;
     }
 
-    // ----------------------------------------------------------
-    // Convert critic tasks into ResearchTask objects
-    // ----------------------------------------------------------
-
     const existingDescriptions = new Set(
       state.tasks.map(
         (task) => task.description,
@@ -144,10 +112,6 @@ export async function runResearchAgent(
       state.tasks.length + 1;
 
     for (const nextTask of critique.nextTasks) {
-      // The Critic is supposed to return strings.
-      // We also safely handle an object in case the LLM
-      // returns { description: "..." }.
-
       let description: string | null = null;
 
       if (typeof nextTask === "string") {
@@ -169,7 +133,6 @@ export async function runResearchAgent(
         }
       }
 
-      // Ignore malformed tasks
       if (!description) {
         console.warn(
           "\nSkipping malformed critic task:",
@@ -189,7 +152,6 @@ export async function runResearchAgent(
         continue;
       }
 
-      // Avoid duplicate tasks
       if (
         existingDescriptions.has(
           normalizedDescription,
@@ -222,10 +184,6 @@ export async function runResearchAgent(
     }
   }
 
-  // ============================================================
-  // 3. RESEARCH PHASE COMPLETE
-  // ============================================================
-
   console.log("\n==============================");
   console.log("RESEARCH PHASE COMPLETE");
   console.log("==============================");
@@ -252,10 +210,6 @@ export async function runResearchAgent(
     }`,
   );
 
-  // ============================================================
-  // 4. WRITER
-  // ============================================================
-
   if (state.findings.length === 0) {
     console.warn(
       "\nNo findings available. Writer will not run.",
@@ -269,10 +223,6 @@ export async function runResearchAgent(
   console.log("==============================");
 
   await writer(state);
-
-  // ============================================================
-  // 5. FINAL RESULT
-  // ============================================================
 
   console.log("\n==============================");
   console.log("RESEARCH AGENT COMPLETE");

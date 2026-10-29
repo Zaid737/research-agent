@@ -25,18 +25,15 @@ export type CriticResult = {
 };
 
 export type ResearchState = {
-  query: string;                    //original user request
-  tasks: ResearchTask[];            //Planner's output
+  query: string;
+  tasks: ResearchTask[];
   currentTaskId: string | null;
-  sources: Source[];                //actual sources retrieved through our MCP tools             
+  sources: Source[];
   findings: Finding[];
   critique: CriticResult | null;
   iteration: number;
   finalAnswer: string | null;
 };
-
-// Sources = raw evidence
-// Findings = interpreted evidence
 
 export function createInitialState(query: string): ResearchState {
   return {
